@@ -1,0 +1,12 @@
+{
+    "workbench.editor.customLabels.enabled": true,
+    "workbench.editor.customLabels.patterns": {
+        "**/packages/**/*": "${dirname}/${filename} - ${dirname(-3)}"
+    },
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        "source.removeUnusedImports": "explicit",
+        "source.sortImports": "explicit"
+    }
+}

@@ -13,22 +13,22 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@hono/node-server": "1.13.5",
+    "@hono/node-server": "1.13.7",
     "@types/figlet": "1.7.0",
-    "@types/node": "22.9.0",
+    "@types/node": "22.9.3",
     "enhanced-resolve": "5.17.1",
     "gradient-string": "3.0.0",
     "minimatch": "10.0.1",
     "rimraf": "6.0.1",
-    "tsc-watch": "6.2.0",
+    "tsc-watch": "6.2.1",
     "tsx": "4.19.2",
-    "typescript": "5.6.3"
+    "typescript": "5.7.2"
   },
   "dependencies": {
     "@hono/swagger-ui": "0.4.1",
-    "@hono/zod-openapi": "0.16.4",
+    "@hono/zod-openapi": "0.18.0",
     "@hono/zod-validator": "0.4.1",
-    "@scalar/hono-api-reference": "0.5.159",
+    "@scalar/hono-api-reference": "0.5.161",
     "@types/source-map-support": "0.5.10",
     "figlet": "1.8.0",
     "source-map-support": "0.5.21",

@@ -9,6 +9,7 @@ import { logger } from "hono/logger";
 import { trimTrailingSlash } from "hono/trailing-slash";
 import { install } from "source-map-support";
 import { z } from "zod";
+
 install({
   environment: "node",
 });

@@ -7,7 +7,11 @@ import { contextStorage } from "hono/context-storage";
 import { showRoutes } from "hono/dev";
 import { logger } from "hono/logger";
 import { trimTrailingSlash } from "hono/trailing-slash";
+import { install } from "source-map-support";
 import { z } from "zod";
+install({
+  environment: "node",
+});
 
 const app = new OpenAPIHono();
 

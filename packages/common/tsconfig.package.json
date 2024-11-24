@@ -1,17 +1,17 @@
 {
-    "extends": "../../tsconfig.base.json",
-    "compilerOptions": {
-        "outDir": "../../dist/common",
-        "rootDir": "./src",
-        "tsBuildInfoFile": "../../.cache/common.tsbuildinfo",
-        "composite": true
-    },
-    "include": [
-        "src"
-    ],
-    "exclude": [
-        "test",
-        "lib"
-    ],
-    "references": []
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../dist/common",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.cache/common.tsbuildinfo",
+    "composite": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "test",
+    "lib"
+  ],
+  "references": []
 }

@@ -2,28 +2,33 @@
 import eresolve from "enhanced-resolve";
 import figlet from "figlet";
 import { rainbow } from 'gradient-string';
+import { exec } from "node:child_process";
 import fs from "node:fs";
 import { isBuiltin } from "node:module";
 import { dirname, resolve as fsResolve } from "node:path";
 import { cwd } from "node:process";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { promisify } from "node:util";
 import packageJson from "../package.json" with { type: "json" };
 
-const projectName = `@${packageJson.name}`;
+const execAsync = promisify(exec);
+
+const workspaceName = `@${packageJson.name}`;
 const version = packageJson.version;
 
 const baseURL = pathToFileURL(cwd() + "/").href;
 
 export async function initialize({ packageName }) {
-  figlet(`${projectName}/${packageName}#${version}`, (_, text = '') => console.log(rainbow.multiline(text)));
+  await execAsync(`npm run update-workspace-deps`);
+  figlet(`${workspaceName}/${packageName}#${version}`, (_, text = '') => console.log(rainbow.multiline(text)));
 } 
 
 
 /**
- * @param {String} specifier
- * @param {*} context
- * @param {*} next
- * @returns
+ * @param {Parameters<import("node:module").ResolveHook>[0]} specifier
+ * @param {Parameters<import("node:module").ResolveHook>[1]} context
+ * @param {Parameters<import("node:module").ResolveHook>[2]} next
+ * @returns {Promise<import("node:module").ResolveFnOutput>}
  */
 export async function resolve(specifier, context, next) {
   let { parentURL = baseURL } = context;
@@ -32,7 +37,7 @@ export async function resolve(specifier, context, next) {
     isBuiltin(specifier) ||
     (!specifier.startsWith("./") &&
       !specifier.startsWith("../") &&
-      !specifier.startsWith(projectName))
+      !specifier.startsWith(workspaceName))
   ) {
     return next(specifier, context);
   }
@@ -46,9 +51,10 @@ export async function resolve(specifier, context, next) {
     specifier = fileURLToPath(specifier);
   }
 
-  if (specifier.startsWith(projectName)) {
-    specifier = specifier.replace(projectName, fsResolve(cwd(), "./dist"));
-    parentURL = pathToFileURL(fsResolve(cwd(), "./dist/common"));
+  if (specifier.startsWith(workspaceName)) {
+    const packageName = specifier.replace(`${workspaceName}/`,'').split('/').pop();
+    specifier = specifier.replace(workspaceName, fsResolve(cwd(), "./dist"));
+    parentURL = pathToFileURL(fsResolve(cwd(), `./dist/${packageName}`)).toString();
   }
 
   const parentPath = fileURLToPath(parentURL);

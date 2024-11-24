@@ -59,10 +59,12 @@ const getWorkspaceDeps = (deps: string[], projectName: string, projects: string[
 const updateProjectReferences = async (projectName: string, projectDeps: string[]) => {
     const projectTsConfigPath = resolve(import.meta.dirname, `../${workspaceDir}/${projectName}/tsconfig.package.json`);
     const projectTsConfig = JSON.parse(await readFile(projectTsConfigPath, { encoding: 'utf-8' }));
-    projectTsConfig.references = projectDeps.map(dep => ({
-        path: `../${dep}/${projectTsConfigName}`
-    }));
-    await writeFile(projectTsConfigPath, JSON.stringify(projectTsConfig, null, 2));
+    const newReferences = projectDeps.map(dep => `../${dep}/${projectTsConfigName}`).toSorted();
+    const oldReferences = projectTsConfig.references.map((dep: any) => dep.path).toSorted();
+    if (newReferences.toString() !== oldReferences.toString()) {
+        projectTsConfig.references = newReferences.map(path => ({ path }));
+        await writeFile(projectTsConfigPath, JSON.stringify(projectTsConfig, null, 2));
+    }
 }
 
 export const updateReferences = async () => {

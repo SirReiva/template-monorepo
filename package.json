@@ -13,7 +13,6 @@
 	"license": "ISC",
 	"description": "",
 	"devDependencies": {
-		"@hono/node-server": "1.13.7",
 		"@types/figlet": "1.7.0",
 		"@types/node": "22.9.3",
 		"enhanced-resolve": "5.17.1",
@@ -25,6 +24,7 @@
 		"typescript": "5.7.2"
 	},
 	"dependencies": {
+		"@hono/node-server": "1.13.7",
 		"@hono/swagger-ui": "0.4.1",
 		"@hono/zod-openapi": "0.18.0",
 		"@hono/zod-validator": "0.4.1",

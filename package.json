@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"clear": "rimraf dist .cache",
-		"server": "tsc-watch -b ./packages/server/tsconfig.package.json --verbose --onSuccess \"node --import=./loader/index.mjs --expose-internals ./dist/server/main.js\"",
+		"dev": "tsx ./tools/actions/run-dev.ts server",
 		"start": "node --import=./loader/index.mjs ./dist/server/main.js",
 		"update-workspace-deps": "tsx ./tools/actions/update-deps.ts"
 	},

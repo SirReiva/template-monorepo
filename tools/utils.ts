@@ -9,7 +9,7 @@ const prefix = '@';
 export const workspaceDir = 'packages';
 const projectTsConfigName = 'tsconfig.package.json';
 
-const isWindows = process.platform === 'win32';
+export const isWindows = process.platform === 'win32';
 function isRelativePath(p: string) {
     return (
         p.charAt(0) === '.' &&
@@ -65,6 +65,12 @@ const updateProjectReferences = async (projectName: string, projectDeps: string[
         projectTsConfig.references = newReferences.map(path => ({ path }));
         await writeFile(projectTsConfigPath, JSON.stringify(projectTsConfig, null, 2));
     }
+}
+
+export const getPackageScripts = async (projectName: string) => {
+    const projectTsConfigPath = resolve(import.meta.dirname, `../${workspaceDir}/${projectName}/tsconfig.package.json`);
+    const projectTsConfig = JSON.parse(await readFile(projectTsConfigPath, { encoding: 'utf-8' }));
+	return projectTsConfig.scripts ?? {};
 }
 
 export const updateReferences = async () => {

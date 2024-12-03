@@ -1,12 +1,14 @@
 {
-    "workbench.editor.customLabels.enabled": true,
-    "workbench.editor.customLabels.patterns": {
-        "**/packages/**/*": "@template/${dirname(-3)} - ${dirname}/${filename}"
-    },
-    "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit",
-        "source.removeUnusedImports": "explicit",
-        "source.sortImports": "explicit"
-    }
+	"workbench.editor.customLabels.enabled": true,
+	"workbench.editor.customLabels.patterns": {
+		"**/packages/**/*": "@template/${dirname(-3)} - ${dirname}/${filename}"
+	},
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": "explicit",
+		"source.removeUnusedImports": "explicit",
+		"source.sortImports": "explicit",
+		"source.fix,All.ts": "explicit"
+	},
+	"typescript.preferences.preferTypeOnlyAutoImports": true
 }

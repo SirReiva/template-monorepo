@@ -6,7 +6,7 @@ import { FileTreeWalker } from './walker';
 
 const workspaceName = pkgjson.name;
 const prefix = '@';
-const workspaceDir = 'packages';
+export const workspaceDir = 'packages';
 const projectTsConfigName = 'tsconfig.package.json';
 
 const isWindows = process.platform === 'win32';
@@ -23,7 +23,7 @@ function isRelativePath(p: string) {
     );
 }
 
-const getDirectories = async (source: string) =>
+export const getDirectories = async (source: string) =>
     (await readdir(source, { withFileTypes: true }))
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name);

@@ -1,4 +1,4 @@
-import { BigIntStats, Stats } from "node:fs";
+import { type BigIntStats, Stats } from "node:fs";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { basename, extname, join } from "node:path";
 

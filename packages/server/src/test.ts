@@ -1,5 +1,5 @@
 export class Test {
-  fn(n: number) {
-    return n;
-  }
+	fn(n: number) {
+		return n;
+	}
 }

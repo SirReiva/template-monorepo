@@ -19,9 +19,9 @@ const version = packageJson.version;
 const baseURL = pathToFileURL(cwd() + "/").href;
 
 export async function initialize({ packageName }) {
-  await execAsync(`npm run update-workspace-deps`);
-  figlet(`${workspaceName}/${packageName}#${version}`, (_, text = '') => console.log(rainbow.multiline(text)));
-} 
+	await execAsync(`npm run update-workspace-deps`);
+	figlet(`${workspaceName}/${packageName}#${version}`, (_, text = '') => console.log(rainbow.multiline(text)));
+}
 
 
 /**
@@ -31,57 +31,57 @@ export async function initialize({ packageName }) {
  * @returns {Promise<import("node:module").ResolveFnOutput>}
  */
 export async function resolve(specifier, context, next) {
-  let { parentURL = baseURL } = context;
+	let { parentURL = baseURL } = context;
 
-  if (
-    isBuiltin(specifier) ||
-    (!specifier.startsWith("./") &&
-      !specifier.startsWith("../") &&
-      !specifier.startsWith(workspaceName))
-  ) {
-    return next(specifier, context);
-  }
+	if (
+		isBuiltin(specifier) ||
+		(!specifier.startsWith("./") &&
+		!specifier.startsWith("../") &&
+		!specifier.startsWith(workspaceName))
+	) {
+		return next(specifier, context);
+	}
 
-  const resolver = eresolve.ResolverFactory.createResolver({
-    extensions: [".js", ".mjs"],
-    fileSystem: fs,
-  });
+	const resolver = eresolve.ResolverFactory.createResolver({
+		extensions: [".js", ".mjs"],
+		fileSystem: fs,
+	});
 
-  if (specifier.startsWith("file://")) {
-    specifier = fileURLToPath(specifier);
-  }
+	if (specifier.startsWith("file://")) {
+		specifier = fileURLToPath(specifier);
+	}
 
-  if (specifier.startsWith(workspaceName)) {
-    const packageName = specifier.replace(`${workspaceName}/`,'').split('/').pop();
-    specifier = specifier.replace(workspaceName, fsResolve(cwd(), "./dist"));
-    parentURL = pathToFileURL(fsResolve(cwd(), `./dist/${packageName}`)).toString();
-  }
+	if (specifier.startsWith(workspaceName)) {
+		const packageName = specifier.replace(`${workspaceName}/`,'').split('/').pop();
+		specifier = specifier.replace(workspaceName, fsResolve(cwd(), "./dist"));
+		parentURL = pathToFileURL(fsResolve(cwd(), `./dist/${packageName}`)).toString();
+	}
 
-  const parentPath = fileURLToPath(parentURL);
-  try {
-    const resolution = await new Promise((res, rej) => {
-      resolver.resolve(
-        {},
-        dirname(parentPath),
-        specifier,
-        {},
-        (err, result) => {
-          if (err) {
-            rej(err);
-            return;
-          }
-          if (!result) rej(new Error("File Not found"));
-          res(result);
-        }
-      );
-    });
-    const url = pathToFileURL(resolution).href;
-    return next(url, context);
-  } catch (error) {
-    if (error.code === "MODULE_NOT_FOUND") {
-      error.code = "ERR_MODULE_NOT_FOUND";
-    }
-    error.specifier = specifier;
-    throw error;
-  }
+	const parentPath = fileURLToPath(parentURL);
+	try {
+		const resolution = await new Promise((res, rej) => {
+			resolver.resolve(
+				{},
+				dirname(parentPath),
+				specifier,
+				{},
+				(err, result) => {
+					if (err) {
+						rej(err);
+						return;
+					}
+					if (!result) rej(new Error("File Not found"));
+					res(result);
+				}
+			);
+		});
+		const url = pathToFileURL(resolution).href;
+		return next(url, context);
+	} catch (error) {
+		if (error.code === "MODULE_NOT_FOUND") {
+		error.code = "ERR_MODULE_NOT_FOUND";
+		}
+		error.specifier = specifier;
+		throw error;
+	}
 }

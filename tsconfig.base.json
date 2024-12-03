@@ -16,6 +16,7 @@
         "noImplicitReturns": true,
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
+        "verbatimModuleSyntax": true,
         "strict": true,
         "importsNotUsedAsValues": "remove",
         "forceConsistentCasingInFileNames": true,

@@ -1,7 +1,7 @@
 {
     "workbench.editor.customLabels.enabled": true,
     "workbench.editor.customLabels.patterns": {
-        "**/packages/**/*": "${dirname}/${filename} - ${dirname(-3)}"
+        "**/packages/**/*": "@template/${dirname(-3)} - ${dirname}/${filename}"
     },
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {

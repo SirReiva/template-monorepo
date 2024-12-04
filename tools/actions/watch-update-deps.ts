@@ -23,7 +23,6 @@ console.log(watchFolder);
 const watcher = new Watcher(watchFolder, {
 	recursive: true,
 	ignoreInitial: true,
-	debounce: 450,
 });
 
 let subProcess: ChildProcessByStdio<null, null, null> | null;

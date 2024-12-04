@@ -19,11 +19,14 @@
 		}
 	],
 	"scripts": {
-		"dev": [
-			"tsc-watch",
-			"-b ./packages/server/tsconfig.package.json",
-			"--verbose",
-			"--onSuccess \"node --import=./loader/index.mjs --expose-internals ./dist/server/main.js\""
-		]
+		"dev": {
+			"command": "npm",
+			"args": [
+				"run",
+				"dev-watch",
+				"--",
+				"server"
+			]
+		}
 	}
 }

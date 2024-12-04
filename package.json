@@ -4,9 +4,9 @@
 	"type": "module",
 	"scripts": {
 		"clear": "rimraf dist .cache",
-		"dev": "tsx ./tools/actions/run-dev.ts server",
-		"start": "node --import=./loader/index.mjs ./dist/server/main.js",
-		"update-workspace-deps": "tsx ./tools/actions/update-deps.ts"
+		"dev": "tsx ./tools/actions/run-dev.ts",
+		"update-workspace-deps": "tsx ./tools/actions/update-deps.ts",
+		"dev-watch": "tsx ./tools/actions/watch-update-deps.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -27,7 +27,8 @@
 		"tsx": "4.19.2",
 		"typescript": "5.7.2",
 		"vite": "6.0.2",
-		"vite-tsconfig-paths": "5.1.3"
+		"vite-tsconfig-paths": "5.1.3",
+		"watcher": "2.3.1"
 	},
 	"dependencies": {
 		"@hono/node-server": "1.13.7",

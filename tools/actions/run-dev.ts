@@ -22,9 +22,11 @@ const devScript = scripts["dev"];
 
 if (!devScript) throw new Error(`${packageName} dev script not defined`);
 
-const npmCommand = isWindows ? "npx.cmd" : "npx";
+const { command, args } = devScript;
 
-spawn(npmCommand, devScript, {
+const npmCommand = isWindows ? `${command}.cmd` : command;
+
+spawn(npmCommand, args, {
 	cwd: cwd(),
 	shell: true,
 	stdio: [process.stdin, process.stdout, process.stderr],

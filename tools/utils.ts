@@ -63,7 +63,7 @@ const updateProjectReferences = async (projectName: string, projectDeps: string[
     const oldReferences = projectTsConfig.references.map((dep: any) => dep.path).toSorted();
     if (newReferences.toString() !== oldReferences.toString()) {
         projectTsConfig.references = newReferences.map(path => ({ path }));
-        await writeFile(projectTsConfigPath, JSON.stringify(projectTsConfig, null, 2));
+        await writeFile(projectTsConfigPath, JSON.stringify(projectTsConfig, null, 4));
     }
 }
 

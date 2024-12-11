@@ -73,6 +73,25 @@ export const getPackageScripts = async (projectName: string) => {
 	return projectTsConfig.scripts ?? {};
 }
 
+export const getProjectsWorskapceDeps = async() => {
+	const packageNames = await getDirectories(resolve(import.meta.dirname, `../${workspaceDir}`));
+	return await Promise.all(packageNames.map(async pkgName => ({
+		name: pkgName,
+		deps: await getProjectWorkspaceDeps(pkgName, packageNames)
+	})));
+}
+
+export const getProjectWorskspaceDeps = async(projectName: string) => {
+	const packageNames = await getDirectories(resolve(import.meta.dirname, `../${workspaceDir}`));
+	return await getProjectWorkspaceDeps(projectName, packageNames);
+}
+
+export const getProjectWorkspaceDeps = async (pkgName: string, packageNames: string[]) => {
+	const innerDeps = await loadProjectDeps(resolve(import.meta.dirname, `../packages/${pkgName}/src`));
+        const innerWorksapceDeps = getWorkspaceDeps(innerDeps, pkgName, packageNames);
+		return innerWorksapceDeps;
+}
+
 export const updateReferences = async () => {
     const packageNames = await getDirectories(resolve(import.meta.dirname, `../${workspaceDir}`));
 
@@ -80,5 +99,5 @@ export const updateReferences = async () => {
         const innerDeps = await loadProjectDeps(resolve(import.meta.dirname, `../packages/${pkgName}/src`));
         const innerWorksapceDeps = getWorkspaceDeps(innerDeps, pkgName, packageNames);
         await updateProjectReferences(pkgName, innerWorksapceDeps);
-    }))
+    }));
 }

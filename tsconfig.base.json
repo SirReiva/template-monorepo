@@ -23,6 +23,8 @@
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": true,
 		"allowSyntheticDefaultImports": true,
+		"incremental": true,
+		"extendedDiagnostics": true,
 		"paths": {
 			"@template/common": [
 				"./packages/common/src/index.ts"

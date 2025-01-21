@@ -1,10 +1,15 @@
-import { spawn, type ChildProcessByStdio } from "child_process";
-import { once } from "events";
-import { exec } from "node:child_process";
+import { exec, spawn, type ChildProcessByStdio } from "node:child_process";
+import { once } from "node:events";
+import { relative, resolve, sep } from "node:path";
+import { cwd } from "node:process";
 import { promisify } from "node:util";
-import { resolve } from "path";
-import { cwd } from "process";
-import { getDirectories, updateReferences, workspaceDir } from "tools/utils";
+import { build } from "tools/compiler";
+import {
+	getDirectories,
+	getProjectWorskspaceDeps,
+	updateReferences,
+	workspaceDir,
+} from "tools/utils";
 import Watcher from "watcher";
 
 const packageNames = await getDirectories(
@@ -28,7 +33,21 @@ const watcher = new Watcher(watchFolder, {
 let subProcess: ChildProcessByStdio<null, null, null> | null;
 let isUpdating = false;
 
-const updater = async () => {
+const updater = async (fileChangePath: string | null) => {
+	if (fileChangePath) {
+		const updateFileProject = relative(
+			resolve(cwd(), "packages"),
+			fileChangePath
+		)
+			.split(sep)
+			.shift();
+		const deps = [
+			...(await getProjectWorskspaceDeps(packageName)),
+			packageName,
+		];
+		const contains = !!deps.find((p) => p === updateFileProject);
+		if (!contains) return;
+	}
 	if (isUpdating) return;
 	isUpdating = true;
 	console.clear();
@@ -37,20 +56,21 @@ const updater = async () => {
 		await once(subProcess, "close");
 	}
 	await updateReferences();
-	const {
-		stdout,
-		stderr,
-		code = 0,
-	} = (await execAsync(
-		`npx tsc -b ./packages/${packageName}/tsconfig.package.json --verbose`,
-		{
-			cwd: cwd(),
-		}
-	).catch((err) => {
-		return { stdout: undefined, stderr: err.stdout, code: err.code };
-	})) as any;
-	console.log(stdout);
-	console.log(stderr);
+	// const {
+	// 	stdout,
+	// 	stderr,
+	// 	code = 0,
+	// } = (await execAsync(
+	// 	`npx tsc -b ./packages/${packageName}/tsconfig.package.json --verbose`,
+	// 	{
+	// 		cwd: cwd(),
+	// 	}
+	// ).catch((err) => {
+	// 	return { stdout: undefined, stderr: err.stdout, code: err.code };
+	// })) as any;
+	// console.log(stdout);
+	// console.log(stderr);
+	const code = !build(packageName);
 	if (!code) {
 		subProcess = spawn(
 			"node",
@@ -61,7 +81,7 @@ const updater = async () => {
 			}
 		);
 		subProcess.once("spawn", () => {
-			console.clear();
+			//console.clear();
 		});
 		subProcess.once("close", () => {
 			subProcess = null;
@@ -70,17 +90,17 @@ const updater = async () => {
 	isUpdating = false;
 };
 
-watcher.on("add", (_filePath) => {
-	updater();
+watcher.on("add", (filePath) => {
+	updater(filePath);
 });
-watcher.on("change", (_filePath) => {
-	updater();
+watcher.on("change", (filePath) => {
+	updater(filePath);
 });
-watcher.on("rename", (_filePath, _filePathNext) => {
-	updater();
+watcher.on("rename", (_filePath, filePathNext) => {
+	updater(filePathNext);
 });
-watcher.on("unlink", (_filePath) => {
-	updater();
+watcher.on("unlink", (filePath) => {
+	updater(filePath);
 });
 
-updater();
+updater(null);

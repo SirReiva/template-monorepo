@@ -1,24 +1,41 @@
 //@ts-check
+import { exec, spawnSync } from "node:child_process";
 import { register } from "node:module";
-import { sep } from "node:path";
+import { basename, resolve } from "node:path";
+import { cwd } from "node:process";
 import { pathToFileURL } from "node:url";
-import { install } from "source-map-support";
+import { promisify } from "node:util";
+const execAsync = promisify(exec);
 
-install({
-	environment: "node",
+const packageName = basename(
+	cwd().replace(resolve(import.meta.dirname, "../packages"), "")
+);
+
+console.clear();
+console.time("Updating dependencies");
+await execAsync(`tsx ../tools/actions/pre-dev.ts ${packageName}`, {
+	cwd: import.meta.dirname,
 });
+console.timeEnd("Updating dependencies");
 
-const packageName =
-	process.argv[1]
-		.split("dist")
-		.pop()
-		?.split(sep)
-		.filter((s) => s.length > 0)
-		.shift() ?? "";
+console.time("Type Checking");
+const result = spawnSync(
+	"npx",
+	["tsc", "-b", `./packages/${packageName}/tsconfig.package.json`],
+	{
+		cwd: resolve(import.meta.dirname, "../"),
+		stdio: [undefined, process.stdout, process.stderr],
+	}
+);
+console.timeEnd("Type Checking");
 
-register("./loader/loader.mjs", pathToFileURL("./"), {
-	data: {
-		packageName,
-	},
-	parentURL: pathToFileURL("./"),
-});
+if (result.status || result.error) {
+	process.exit(result.status ?? String(result.error));
+} else {
+	register("../../loader/loader.mjs", pathToFileURL("./"), {
+		data: {
+			packageName,
+		},
+		parentURL: pathToFileURL("./"),
+	});
+}

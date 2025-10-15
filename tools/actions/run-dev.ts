@@ -26,8 +26,13 @@ const { command, args } = devScript;
 
 const npmCommand = isWindows && command === "npm" ? `${command}.cmd` : command;
 
+const dir = resolve(cwd(), "packages", packageName);
+
+process.loadEnvFile(resolve(dir, "./.env.dev"));
+
 spawn(npmCommand, args, {
-	cwd: resolve(cwd(), "packages", packageName),
+	cwd: dir,
 	shell: true,
 	stdio: [process.stdin, process.stdout, process.stderr],
+	env: process.env,
 });

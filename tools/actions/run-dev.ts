@@ -24,10 +24,10 @@ if (!devScript) throw new Error(`${packageName} dev script not defined`);
 
 const { command, args } = devScript;
 
-const npmCommand = isWindows ? `${command}.cmd` : command;
+const npmCommand = isWindows && command === "npm" ? `${command}.cmd` : command;
 
 spawn(npmCommand, args, {
-	cwd: cwd(),
+	cwd: resolve(cwd(), "packages", packageName),
 	shell: true,
 	stdio: [process.stdin, process.stdout, process.stderr],
 });

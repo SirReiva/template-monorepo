@@ -9,4 +9,6 @@ serve({
 });
 showRoutes(app);
 
-console.log(`Server is running on http://localhost:${port}...`);
+// const a: number = "a";
+
+console.log(`Server is running on: http://localhost:${port}...`);

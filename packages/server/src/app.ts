@@ -1,12 +1,21 @@
 import { swaggerUI } from "@hono/swagger-ui";
-import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
-import { apiReference } from "@scalar/hono-api-reference";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { Scalar } from "@scalar/hono-api-reference";
 import { contextStorage } from "hono/context-storage";
 import { logger } from "hono/logger";
 import { trimTrailingSlash } from "hono/trailing-slash";
 import { z } from "zod";
 
-export const app = new OpenAPIHono();
+export const app = new OpenAPIHono({
+	defaultHook: (result, c) => {
+		if (!result.success) {
+			throw new Error(result.error.message, {
+				cause: result.error,
+			});
+		}
+		return;
+	},
+});
 
 app.use(contextStorage());
 app.use(trimTrailingSlash());
@@ -22,7 +31,7 @@ app.doc("/doc", {
 
 app.get(
 	"/reference",
-	apiReference({
+	Scalar({
 		spec: {
 			url: "/doc",
 		},
@@ -36,7 +45,7 @@ const route = createRoute({
 	path: "/",
 	request: {
 		query: z.object({
-			hello: z.string().optional(),
+			hello: z.string().endsWith("z").optional(),
 		}),
 	},
 	responses: {
@@ -57,4 +66,11 @@ const route = createRoute({
 app.openapi(route, (c) => {
 	const query = c.req.valid("query");
 	return c.json({ hello: query.hello, var: "" }, 200);
+});
+
+app.onError((err, c) => {
+	return c.json(
+		{ error: "Internal server error", data: (err.cause as any).issues },
+		500
+	);
 });

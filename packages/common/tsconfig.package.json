@@ -1,7 +1,7 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"outDir": "../../dist/common",
+		"outDir": "../../.cache/common",
 		"rootDir": "./src",
 		"tsBuildInfoFile": "../../.cache/common.tsbuildinfo",
 		"composite": true
@@ -12,6 +12,5 @@
 	"exclude": [
 		"test",
 		"lib"
-	],
-	"references": []
+	]
 }

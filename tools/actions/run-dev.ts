@@ -28,7 +28,9 @@ const npmCommand = isWindows && command === "npm" ? `${command}.cmd` : command;
 
 const dir = resolve(cwd(), "packages", packageName);
 
-process.loadEnvFile(resolve(dir, "./.env.dev"));
+try {
+	process.loadEnvFile(resolve(dir, "./.env.dev"));
+} catch (error) {}
 
 spawn(npmCommand, args, {
 	cwd: dir,

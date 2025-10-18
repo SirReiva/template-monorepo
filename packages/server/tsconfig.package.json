@@ -18,6 +18,7 @@
 			"command": "node",
 			"args": [
 				"--import=../../loader/index.mjs",
+				"--experimental-transform-types",
 				"--watch-path",
 				"../",
 				"./src/main.ts"

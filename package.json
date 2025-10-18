@@ -17,7 +17,6 @@
 		"@types/node": "24.8.1",
 		"@types/react": "19.2.2",
 		"@types/react-dom": "19.2.2",
-		"@typescript/native-preview": "7.0.0-dev.20250523.1",
 		"@vitejs/plugin-react": "5.0.4",
 		"enhanced-resolve": "5.18.3",
 		"globals": "16.4.0",

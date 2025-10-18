@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"noEmit": true,
 		"baseUrl": ".",
-		"erasableSyntaxOnly": true
+		"moduleResolution": "bundler"
 	},
 	"exclude": [
 		"dist",

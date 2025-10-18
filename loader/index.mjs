@@ -22,7 +22,7 @@ console.timeEnd("Updating dependencies");
 console.time("Type Checking");
 const result = spawnSync(
 	"npx",
-	["tsgo", "-b", `./packages/${packageName}/tsconfig.package.json`],
+	["tsc", "-b", `./packages/${packageName}/tsconfig.package.json`],
 	{
 		cwd: resolve(import.meta.dirname, "../"),
 		stdio: [undefined, process.stdout, process.stderr],
@@ -31,8 +31,8 @@ const result = spawnSync(
 console.timeEnd("Type Checking");
 console.timeEnd("Start time");
 
-if (result.status !== 1 || result.error) {
-	process.exit(result.status ?? String(result.error));
+if (result.status !== 0 || result.error) {
+	process.exit(result.status ?? 1);
 } else {
 	register("../../loader/loader.mjs", pathToFileURL("./"), {
 		data: {

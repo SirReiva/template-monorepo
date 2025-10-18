@@ -1,18 +1,17 @@
 {
-	"extends": "../../tsconfig.base.json",
-	"files": [],
-	"references": [
-		{
-			"path": "../common/tsconfig.package.json"
-		}
-	],
-	"scripts": {
-		"dev": {
-			"command": "npx",
-			"args": [
-				"vite",
-				"./packages/front"
-			]
-		}
-	}
+    "extends": "../../tsconfig.base.json",
+    "files": [],
+    "references": [
+        {
+            "path": "../common/tsconfig.package.json"
+        }
+    ],
+    "scripts": {
+        "dev": {
+            "command": "npx",
+            "args": [
+                "vite"
+            ]
+        }
+    }
 }

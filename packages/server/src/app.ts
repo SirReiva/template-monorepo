@@ -1,4 +1,4 @@
-import { swaggerUI } from "@hono/swagger-ui";
+import { swaggerUI, type SwaggerUIOptions } from "@hono/swagger-ui";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { contextStorage } from "hono/context-storage";
@@ -43,7 +43,9 @@ app.get(
 	})
 );
 
-app.get("/ui", swaggerUI({ url: "/doc" }));
+const opts: SwaggerUIOptions = { url: "/doc" };
+
+app.get("/ui", swaggerUI(opts));
 
 const route = createRoute({
 	method: "get",

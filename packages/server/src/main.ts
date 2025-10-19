@@ -1,14 +1,13 @@
-import { serve } from "@hono/node-server";
-import { port } from "@template/common";
-import { showRoutes } from "hono/dev";
-import { app } from "./app";
+import { Application } from "@template/server-framework/class/application";
 
-serve({
-	fetch: app.fetch,
-	port,
-});
-showRoutes(app);
+class Test {
+	constructor(public readonly a: number, public readonly b: string) {}
 
-// const a: number = "a";
+	async init(app: Application) {}
+}
 
-console.log(`Server is running on: http://localhost:${port}...`);
+const application = new Application();
+
+application.addModule(Test, () => [1, "2"] as const);
+
+await application.init();

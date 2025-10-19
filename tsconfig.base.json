@@ -29,6 +29,9 @@
 			"@template/common/*": [
 				"./packages/common/src/*"
 			],
+			"@template/server-framework/*": [
+				"./packages/server-framework/src/*"
+			],
 			"@template/server/*": [
 				"./packages/common/src/*"
 			],

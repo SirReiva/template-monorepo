@@ -3,7 +3,7 @@ import figlet from "figlet";
 import { rainbow } from 'gradient-string';
 import { lstat } from "node:fs/promises";
 import { isBuiltin } from "node:module";
-import { dirname, resolve as fsResolve } from "node:path";
+import { resolve as fsResolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import packageJson from "../package.json" with { type: "json" };
 
@@ -20,6 +20,33 @@ export async function initialize({ packageName }) {
 	console.log(`NodeJS${process.version}`);
 }
 
+/**
+ * @param {String} basePath
+ * @returns {Promise<String>}
+ */
+const findFile = async(basePath) => {
+	const dirStat = await lstat(basePath).catch((err) =>{
+		if (err.code === 'ENOENT') return null;
+		throw err;
+	});
+
+	if (dirStat?.isDirectory()) return `${basePath}/index.ts`;
+
+	return `${basePath}.ts`
+}
+
+/**
+ * @param {String} specifier
+ * @returns {Promise<String>}
+ */
+const resolveAliasImport = async(specifier) => {
+	const parts = specifier.replace(`${workspaceName}/`,'').split('/')
+	const packageName = parts.shift();
+	const fileOrFolder = fsResolve(packagesFolder, `./${packageName}/src`, ...parts);
+	const targetFile = await findFile(fileOrFolder);
+	const targetSpecifier = pathToFileURL(targetFile).href;
+	return targetSpecifier;
+}
 
 /**
  * @param {Parameters<import("node:module").ResolveHook>[0]} specifier
@@ -40,17 +67,11 @@ export async function resolve(specifier, context, next) {
 		return next(specifier, context);
 	}
 
-	if (specifier.startsWith(workspaceName)) {
-		const packageName = specifier.replace(`${workspaceName}/`,'').split('../').pop();
-		specifier = specifier.replace(workspaceName + '/' + packageName, "");
-		parentURL = pathToFileURL(fsResolve(packagesFolder, `./${packageName}/src`)).toString();
-	}
 
-	const parentPath = initial.startsWith('.') ? fileURLToPath(dirname(parentURL)) : fileURLToPath(parentURL);
-	const stat =  await lstat(fsResolve(parentPath, specifier)).catch(() => null);
-	specifier = pathToFileURL(stat?.isDirectory() ? fsResolve(parentPath, specifier, 'index.ts') : fsResolve(parentPath, specifier + '.ts')).href;
 	try {
-		return await next(specifier ,context);
+		if(specifier.startsWith(workspaceName)) return await next(await resolveAliasImport(specifier) ,context);
+
+		return next(pathToFileURL(await findFile(specifier)).href, context)
 	} catch (error) {
 		if (error.code === "MODULE_NOT_FOUND") {
 			error.code = "ERR_MODULE_NOT_FOUND";

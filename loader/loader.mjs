@@ -15,6 +15,9 @@ const nodeModulesFolder = fsResolve(import.meta.dirname, '../node_modules');
 
 const baseURL = pathToFileURL(packagesFolder).href;
 
+/**
+ * @param {{ packageName: String; }} context
+ */
 export async function initialize({ packageName }) {
 	figlet(`${workspaceName}/${packageName}#${version}`, (_, text = '') => console.log(rainbow.multiline(text)));
 	console.log(`NodeJS${process.version}`);

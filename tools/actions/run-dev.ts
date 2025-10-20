@@ -12,17 +12,19 @@ const packageNames = await getDirectories(
 	resolve(import.meta.dirname, `../../${workspaceDir}`)
 );
 const packageName = process.argv[process.argv.length - 1];
+const scriptName = process.argv[process.argv.length - 2];
 
 if (!packageName || !packageNames.includes(packageName))
 	throw new Error(`Invalid package ${packageName}`);
 
 const scripts = await getPackageScripts(packageName);
 
-const devScript = scripts["dev"];
+const runScript = scripts[scriptName];
 
-if (!devScript) throw new Error(`${packageName} dev script not defined`);
+if (!runScript)
+	throw new Error(`${packageName} ${scriptName} script not defined`);
 
-const { command, args } = devScript;
+const { command, args } = runScript;
 
 const npmCommand = isWindows && command === "npm" ? `${command}.cmd` : command;
 

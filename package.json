@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"clear": "rimraf dist .cache",
-		"dev": "tsx ./tools/actions/run-dev.ts",
+		"dev": "tsx ./tools/actions/run-script.ts",
 		"update-workspace-deps": "tsx ./tools/actions/update-deps.ts",
 		"dev-watch": "tsx ./tools/actions/watch-update-deps.ts"
 	},

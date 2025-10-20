@@ -21,8 +21,8 @@ const cacheDir = fsResolve(import.meta.dirname, '../.cache')
  * @param {{ packageName: String; }} context
  */
 export async function initialize({ packageName }) {
-	figlet(`${workspaceName}/${packageName}#${version}`, (_, text = '') => console.log(rainbow.multiline(text)));
 	console.log(`NodeJS${process.version}`);
+	console.log(rainbow.multiline((await figlet(`${workspaceName}/${packageName}#${version}`) ?? '')))
 }
 
 /**

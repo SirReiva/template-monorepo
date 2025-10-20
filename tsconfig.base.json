@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"target": "es2024",
 		"module": "ESNext",
-		"moduleResolution": "Node",
+		"moduleResolution": "bundler",
 		"useDefineForClassFields": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,

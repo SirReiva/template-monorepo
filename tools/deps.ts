@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from "typescript";
 
 interface FoundReference {
 	typeOnly: boolean;
@@ -11,13 +11,13 @@ const specifierNodeModule = /^[^\.]/;
 
 const diveDeeper = (path: string, node: ts.Node, found: FoundReference[]) =>
 	Promise.all(
-		node.getChildren().map(n => findAllReferencesNode(path, n, found)),
+		node.getChildren().map((n) => findAllReferencesNode(path, n, found))
 	);
 
 const findAllReferencesNode = async (
 	path: string,
 	node: ts.Node,
-	found: FoundReference[],
+	found: FoundReference[]
 ) => {
 	switch (node.kind) {
 		case ts.SyntaxKind.ExportDeclaration:
@@ -45,13 +45,17 @@ const findAllReferencesNode = async (
 			const importDeclaration = node as ts.ImportDeclaration;
 			const importClause = importDeclaration.importClause;
 
-			const specifier = (importDeclaration.moduleSpecifier as ts.StringLiteral)
-				.text;
+			const specifier = (
+				importDeclaration.moduleSpecifier as ts.StringLiteral
+			).text;
 
 			if (specifier) {
 				if (specifierNodeModule.test(specifier)) {
 					found.push({
-						typeOnly: !!importClause && !importClause.isTypeOnly,
+						typeOnly:
+							!!importClause &&
+							importClause.phaseModifier ===
+								ts.SyntaxKind.TypeKeyword,
 						relativePathReference: false,
 						referencingPath: path,
 						referencedSpecifier: specifier,
@@ -64,13 +68,17 @@ const findAllReferencesNode = async (
 			const callExpression = node as ts.CallExpression;
 
 			if (
-				(callExpression.expression.kind === ts.SyntaxKind.ImportKeyword ||
-					(callExpression.expression.kind === ts.SyntaxKind.Identifier &&
-						callExpression.expression.getText() === 'require')) &&
-				callExpression.arguments[0]?.kind === ts.SyntaxKind.StringLiteral
+				(callExpression.expression.kind ===
+					ts.SyntaxKind.ImportKeyword ||
+					(callExpression.expression.kind ===
+						ts.SyntaxKind.Identifier &&
+						callExpression.expression.getText() === "require")) &&
+				callExpression.arguments[0]?.kind ===
+					ts.SyntaxKind.StringLiteral
 			) {
-				const specifier = (callExpression.arguments[0] as ts.StringLiteral)
-					.text;
+				const specifier = (
+					callExpression.arguments[0] as ts.StringLiteral
+				).text;
 
 				if (specifierNodeModule.test(specifier)) {
 					found.push({
@@ -99,7 +107,7 @@ export const getDespByFile = async (source: string, path: string) => {
 		path,
 		source,
 		ts.ScriptTarget.Latest,
-		/*setParentNodes */ true,
+		/*setParentNodes */ true
 	);
 
 	const found: FoundReference[] = [];

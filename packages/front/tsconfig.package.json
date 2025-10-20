@@ -3,7 +3,7 @@
     "files": [],
     "references": [
         {
-            "path": "../common/tsconfig.package.json"
+            "path": "..\\common\\tsconfig.package.json"
         }
     ],
     "scripts": {

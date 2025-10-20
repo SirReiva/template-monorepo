@@ -1,5 +1,5 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { resolve, sep } from 'node:path';
 import pkgjson from '../package.json' with { type: "json" };
 import { getDespByFile } from './deps';
 import { FileTreeWalker } from './walker';
@@ -57,9 +57,9 @@ const getWorkspaceDeps = (deps: string[], projectName: string, projects: string[
 }
 
 const updateProjectReferences = async (projectName: string, projectDeps: string[]) => {
-    const projectTsConfigPath = resolve(import.meta.dirname, `../${workspaceDir}/${projectName}/tsconfig.package.json`);
+    const projectTsConfigPath = resolve(import.meta.dirname, `..${sep}${workspaceDir}${sep}${projectName}${sep}tsconfig.package.json`);
     const projectTsConfig = JSON.parse(await readFile(projectTsConfigPath, { encoding: 'utf-8' }));
-    const newReferences = projectDeps.map(dep => `../${dep}/${projectTsConfigName}`).toSorted();
+    const newReferences = projectDeps.map(dep => `..${sep}${dep}${sep}${projectTsConfigName}`).toSorted();
     const oldReferences = (projectTsConfig.references ?? []).map((dep: any) => dep.path).toSorted();
     if (newReferences.toString() !== oldReferences.toString()) {
         projectTsConfig.references = newReferences.map(path => ({ path }));
@@ -68,13 +68,13 @@ const updateProjectReferences = async (projectName: string, projectDeps: string[
 }
 
 export const getPackageScripts = async (projectName: string) => {
-    const projectTsConfigPath = resolve(import.meta.dirname, `../${workspaceDir}/${projectName}/tsconfig.package.json`);
+    const projectTsConfigPath = resolve(import.meta.dirname, `..${sep}${workspaceDir}${sep}${projectName}${sep}tsconfig.package.json`);
     const projectTsConfig = JSON.parse(await readFile(projectTsConfigPath, { encoding: 'utf-8' }));
 	return projectTsConfig.scripts ?? {};
 }
 
 export const getProjectsWorskapceDeps = async() => {
-	const packageNames = await getDirectories(resolve(import.meta.dirname, `../${workspaceDir}`));
+	const packageNames = await getDirectories(resolve(import.meta.dirname, `..${sep}${workspaceDir}`));
 	return await Promise.all(packageNames.map(async pkgName => ({
 		name: pkgName,
 		deps: await getProjectWorkspaceDeps(pkgName, packageNames)
@@ -82,21 +82,21 @@ export const getProjectsWorskapceDeps = async() => {
 }
 
 export const getProjectWorskspaceDeps = async(projectName: string) => {
-	const packageNames = await getDirectories(resolve(import.meta.dirname, `../${workspaceDir}`));
+	const packageNames = await getDirectories(resolve(import.meta.dirname, `..${sep}${workspaceDir}`));
 	return await getProjectWorkspaceDeps(projectName, packageNames);
 }
 
 export const getProjectWorkspaceDeps = async (pkgName: string, packageNames: string[]) => {
-	const innerDeps = await loadProjectDeps(resolve(import.meta.dirname, `../packages/${pkgName}/src`));
+	const innerDeps = await loadProjectDeps(resolve(import.meta.dirname, `..${sep}packages${sep}${pkgName}${sep}src`));
         const innerWorksapceDeps = getWorkspaceDeps(innerDeps, pkgName, packageNames);
 		return innerWorksapceDeps;
 }
 
 export const updateReferences = async () => {
-    const packageNames = await getDirectories(resolve(import.meta.dirname, `../${workspaceDir}`));
+    const packageNames = await getDirectories(resolve(import.meta.dirname, `..${sep}${workspaceDir}`));
 
     await Promise.all(packageNames.map(async pkgName => {
-        const innerDeps = await loadProjectDeps(resolve(import.meta.dirname, `../packages/${pkgName}/src`));
+        const innerDeps = await loadProjectDeps(resolve(import.meta.dirname, `..${sep}packages${sep}${pkgName}${sep}src`));
         const innerWorksapceDeps = getWorkspaceDeps(innerDeps, pkgName, packageNames);
         await updateProjectReferences(pkgName, innerWorksapceDeps);
     }));

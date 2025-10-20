@@ -1,9 +1,9 @@
 //@ts-check
 import figlet from "figlet";
 import { rainbow } from 'gradient-string';
-import { lstat } from "node:fs/promises";
+import { lstat, readFile } from "node:fs/promises";
 import { isBuiltin } from "node:module";
-import { dirname, resolve as fsResolve } from "node:path";
+import { dirname, extname, resolve as fsResolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import packageJson from "../package.json" with { type: "json" };
 
@@ -15,12 +15,29 @@ const nodeModulesFolder = fsResolve(import.meta.dirname, '../node_modules');
 
 const baseURL = pathToFileURL(packagesFolder).href;
 
+const cacheDir = fsResolve(import.meta.dirname, '../.cache')
+
 /**
  * @param {{ packageName: String; }} context
  */
 export async function initialize({ packageName }) {
 	figlet(`${workspaceName}/${packageName}#${version}`, (_, text = '') => console.log(rainbow.multiline(text)));
 	console.log(`NodeJS${process.version}`);
+}
+
+/**
+ * @param {String} filePath
+ * @returns {Promise<String>}
+ */
+const findByExtension = async (filePath) => {
+	const fileStat = await lstat(`${filePath}.tsx`).catch((err) =>{
+		if (err.code === 'ENOENT') return null;
+		throw err;
+	});
+
+	if(fileStat) return `${filePath}.tsx`;
+
+	return `${filePath}.ts`;
 }
 
 /**
@@ -33,9 +50,9 @@ const findFile = async(basePath) => {
 		throw err;
 	});
 
-	if (dirStat?.isDirectory()) return `${basePath}/index.ts`;
+	if (dirStat?.isDirectory()) return await findByExtension(`${basePath}${sep}index`);
 
-	return `${basePath}.ts`;
+	return await findByExtension(basePath)
 }
 
 /**
@@ -43,9 +60,9 @@ const findFile = async(basePath) => {
  * @returns {Promise<String>}
  */
 const resolveAliasImport = async(specifier) => {
-	const parts = specifier.replace(`${workspaceName}/`,'').split('/')
+	const parts = specifier.replace(`${workspaceName}${sep}`,'').split(sep)
 	const packageName = parts.shift();
-	const fileOrFolder = fsResolve(packagesFolder, `./${packageName}/src`, ...parts);
+	const fileOrFolder = fsResolve(packagesFolder, `./${packageName}${sep}src`, ...parts);
 	const targetFile = await findFile(fileOrFolder);
 	const targetSpecifier = pathToFileURL(targetFile).href;
 	return targetSpecifier;
@@ -85,4 +102,32 @@ export async function resolve(specifier, context, next) {
 		error.parent = parentPath;
 		throw error;
 	}
+}
+
+
+/**
+ * @param {Parameters<import("node:module").LoadHook>[0]} url
+ * @param {Parameters<import("node:module").LoadHook>[1]} context
+ * @param {Parameters<import("node:module").LoadHook>[2]} defaultLoad
+ * @returns {Promise<import("node:module").LoadFnOutput>}
+ */
+export async function load(url, context, defaultLoad) {
+	try {
+		const fileFullPath = fileURLToPath(url);
+		const ext = extname(fileFullPath);
+		if (ext === '.tsx') {
+			const parts = fileFullPath.split(`${sep}packages${sep}`).pop()?.split(sep);
+			const packageName = parts?.shift() ?? '';
+			parts?.shift();
+			const pathRelative = parts?.join(sep) ?? '';
+			const cacheFile = fsResolve(cacheDir, packageName, pathRelative);
+			return {
+				shortCircuit: true,
+				format: 'module',
+				source: await readFile(cacheFile.replace(/\.tsx$/, '.js'), 'utf-8')
+			}
+		}
+	} catch (error) { }
+
+	return defaultLoad(url, context);
 }

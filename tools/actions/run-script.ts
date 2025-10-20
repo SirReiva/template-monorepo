@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import { resolve } from "path";
+import { resolve, sep } from "path";
 import { cwd } from "process";
 import {
 	getDirectories,
@@ -9,7 +9,7 @@ import {
 } from "tools/utils";
 
 const packageNames = await getDirectories(
-	resolve(import.meta.dirname, `../../${workspaceDir}`)
+	resolve(import.meta.dirname, `..${sep}..${sep}${workspaceDir}`)
 );
 const packageName = process.argv[process.argv.length - 1];
 const scriptName = process.argv[process.argv.length - 2];
@@ -31,7 +31,7 @@ const npmCommand = isWindows && command === "npm" ? `${command}.cmd` : command;
 const dir = resolve(cwd(), "packages", packageName);
 
 try {
-	process.loadEnvFile(resolve(dir, "./.env.dev"));
+	process.loadEnvFile(resolve(dir, `.${sep}.env.dev`));
 } catch (error) {}
 
 spawn(npmCommand, args, {

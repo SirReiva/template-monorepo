@@ -1,43 +1,39 @@
 {
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"outDir": "../../.cache/server",
-		"rootDir": "./src",
-		"tsBuildInfoFile": "../../.cache/server.tsbuildinfo",
-		"composite": true
-	},
-	"include": [
-		"src"
-	],
-	"exclude": [
-		"test",
-		"lib"
-	],
-	"scripts": {
-		"dev": {
-			"command": "node",
-			"args": [
-				"--import=../../loader/index.mjs?mode=dev",
-				"--experimental-transform-types",
-				"--disable-warning=ExperimentalWarning",
-				"--watch-path",
-				"../",
-				"./src/main.ts"
-			]
-		},
-		"start": {
-			"command": "node",
-			"args": [
-				"--import=../../loader/index.mjs",
-				"--experimental-transform-types",
-				"--disable-warning=ExperimentalWarning",
-				"./src/main.ts"
-			]
-		}
-	},
-	"references": [
-		{
-			"path": "../server-framework/tsconfig.package.json"
-		}
-	]
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "../../.cache/server",
+        "rootDir": "./src",
+        "tsBuildInfoFile": "../../.cache/server.tsbuildinfo",
+        "composite": true
+    },
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "test",
+        "lib"
+    ],
+    "scripts": {
+        "dev": {
+            "command": "node",
+            "args": [
+                "--import=../../loader/index.mjs?mode=dev",
+                "--experimental-transform-types",
+                "--disable-warning=ExperimentalWarning",
+                "--watch-path",
+                "../",
+                "./src/main.ts"
+            ]
+        },
+        "start": {
+            "command": "node",
+            "args": [
+                "--import=../../loader/index.mjs",
+                "--experimental-transform-types",
+                "--disable-warning=ExperimentalWarning",
+                "./src/main.ts"
+            ]
+        }
+    },
+    "references": []
 }

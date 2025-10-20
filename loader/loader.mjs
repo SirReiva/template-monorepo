@@ -3,7 +3,7 @@ import figlet from "figlet";
 import { rainbow } from 'gradient-string';
 import { lstat } from "node:fs/promises";
 import { isBuiltin } from "node:module";
-import { resolve as fsResolve } from "node:path";
+import { dirname, resolve as fsResolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import packageJson from "../package.json" with { type: "json" };
 
@@ -35,7 +35,7 @@ const findFile = async(basePath) => {
 
 	if (dirStat?.isDirectory()) return `${basePath}/index.ts`;
 
-	return `${basePath}.ts`
+	return `${basePath}.ts`;
 }
 
 /**
@@ -74,7 +74,8 @@ export async function resolve(specifier, context, next) {
 	try {
 		if(specifier.startsWith(workspaceName)) return await next(await resolveAliasImport(specifier) ,context);
 
-		return next(pathToFileURL(await findFile(specifier)).href, context)
+		const filefullName = fsResolve(dirname(fileURLToPath(parentURL)), specifier);
+		return next(pathToFileURL(await findFile(filefullName)).href, context);
 	} catch (error) {
 		if (error.code === "MODULE_NOT_FOUND") {
 			error.code = "ERR_MODULE_NOT_FOUND";

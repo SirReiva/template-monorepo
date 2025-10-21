@@ -28,6 +28,10 @@ const findByExtension = async (filePath: string) => {
 
 
 const findFile = async(basePath: string) => {
+	const extension = extname(basePath);
+	if (extension) {
+		return basePath;
+	}
 
 	const dirStat = await lstat(basePath).catch((err) =>{
 		if (err.code === 'ENOENT') return null;
@@ -35,11 +39,6 @@ const findFile = async(basePath: string) => {
 	});
 
 	if (dirStat?.isDirectory()) return await findByExtension(`${basePath}${sep}index`);
-
-	const extension = extname(basePath);
-	if (extension) {
-		return basePath;
-	}
 
 	return await findByExtension(basePath)
 }

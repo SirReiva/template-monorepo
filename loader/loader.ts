@@ -1,14 +1,11 @@
-//@ts-check
-import figlet from "figlet";
-import { rainbow } from 'gradient-string';
+
 import { lstat, readFile } from "node:fs/promises";
-import { isBuiltin } from "node:module";
+import { isBuiltin, type LoadHook, type ResolveHook } from "node:module";
 import { dirname, extname, resolve as fsResolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import packageJson from "../package.json" with { type: "json" };
 
 const workspaceName = `@${packageJson.name}`;
-const version = packageJson.version;
 
 const packagesFolder = fsResolve(import.meta.dirname, '../packages');
 const nodeModulesFolder = fsResolve(import.meta.dirname, '../node_modules');
@@ -17,19 +14,8 @@ const baseURL = pathToFileURL(packagesFolder).href;
 
 const cacheDir = fsResolve(import.meta.dirname, '../.cache')
 
-/**
- * @param {{ packageName: String; }} context
- */
-export async function initialize({ packageName }) {
-	console.log(`NodeJS${process.version}`);
-	console.log(rainbow.multiline((await figlet(`${workspaceName}/${packageName}#${version}`) ?? '')))
-}
 
-/**
- * @param {String} filePath
- * @returns {Promise<String>}
- */
-const findByExtension = async (filePath) => {
+const findByExtension = async (filePath: string) => {
 	const fileStat = await lstat(`${filePath}.tsx`).catch((err) =>{
 		if (err.code === 'ENOENT') return null;
 		throw err;
@@ -40,11 +26,9 @@ const findByExtension = async (filePath) => {
 	return `${filePath}.ts`;
 }
 
-/**
- * @param {String} basePath
- * @returns {Promise<String>}
- */
-const findFile = async(basePath) => {
+
+const findFile = async(basePath: string) => {
+
 	const dirStat = await lstat(basePath).catch((err) =>{
 		if (err.code === 'ENOENT') return null;
 		throw err;
@@ -52,15 +36,16 @@ const findFile = async(basePath) => {
 
 	if (dirStat?.isDirectory()) return await findByExtension(`${basePath}${sep}index`);
 
+	const extension = extname(basePath);
+	if (extension) {
+		return basePath;
+	}
+
 	return await findByExtension(basePath)
 }
 
-/**
- * @param {String} specifier
- * @returns {Promise<String>}
- */
-const resolveAliasImport = async(specifier) => {
-	const parts = specifier.replace(`${workspaceName}${sep}`,'').split(sep)
+const resolveAliasImport = async(specifier: string) => {
+	const parts = specifier.replace(`${workspaceName}/`,'').split('/');
 	const packageName = parts.shift();
 	const fileOrFolder = fsResolve(packagesFolder, `./${packageName}${sep}src`, ...parts);
 	const targetFile = await findFile(fileOrFolder);
@@ -68,13 +53,12 @@ const resolveAliasImport = async(specifier) => {
 	return targetSpecifier;
 }
 
-/**
- * @param {Parameters<import("node:module").ResolveHook>[0]} specifier
- * @param {Parameters<import("node:module").ResolveHook>[1]} context
- * @param {Parameters<import("node:module").ResolveHook>[2]} next
- * @returns {Promise<import("node:module").ResolveFnOutput>}
- */
-export async function resolve(specifier, context, next) {
+// export const initialize:InitializeHook<{packageName: string;}> = async ({ packageName }) => {
+// 	console.log(`NodeJS${process.version}`);
+// 	console.log(typeGradientFn.multiline((await figlet(`${workspaceName}/${packageName}#${version}`,{}) ?? '')))
+// };
+
+export const resolve: ResolveHook = async (specifier, context, next) => {
 	const initial = specifier;
 	let { parentURL = baseURL } = context;
 
@@ -93,25 +77,17 @@ export async function resolve(specifier, context, next) {
 
 		const filefullName = fsResolve(dirname(fileURLToPath(parentURL)), specifier);
 		return next(pathToFileURL(await findFile(filefullName)).href, context);
-	} catch (error) {
+	} catch (error: any) {
 		if (error.code === "MODULE_NOT_FOUND") {
 			error.code = "ERR_MODULE_NOT_FOUND";
 		}
 		error.specifier = specifier;
 		error.base = initial;
-		error.parent = parentPath;
 		throw error;
 	}
 }
 
-
-/**
- * @param {Parameters<import("node:module").LoadHook>[0]} url
- * @param {Parameters<import("node:module").LoadHook>[1]} context
- * @param {Parameters<import("node:module").LoadHook>[2]} defaultLoad
- * @returns {Promise<import("node:module").LoadFnOutput>}
- */
-export async function load(url, context, defaultLoad) {
+export const load: LoadHook = async (url, context, defaultLoad) => {
 	try {
 		const fileFullPath = fileURLToPath(url);
 		const ext = extname(fileFullPath);

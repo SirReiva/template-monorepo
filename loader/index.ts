@@ -1,0 +1,68 @@
+import figlet from "figlet";
+import gradient from 'gradient-string';
+import { spawnSync } from "node:child_process";
+import { register } from "node:module";
+import { basename, resolve } from "node:path";
+import { cwd } from "node:process";
+import { pathToFileURL } from "node:url";
+import { Logger } from 'tslog';
+import packageJson from "../package.json" with { type: "json" };
+
+const logger = new Logger({ name: "Loader", });
+
+const workspaceName = `@${packageJson.name}`;
+const version = packageJson.version;
+
+const typeGradients = Object.keys(gradient);
+
+const typeGradient =(typeGradients[Math.floor(Math.random() * typeGradients.length)]) as keyof typeof gradient;
+const typeGradientFn = gradient[typeGradient];
+
+const mode = new URL(import.meta.url).searchParams.get("mode");
+
+const addLoader = () => {
+	register("../../loader/loader.ts", pathToFileURL("./"), {
+		data: {
+			packageName,
+			workspaceName,
+			version,
+		},
+		parentURL: pathToFileURL("./"),
+	});
+};
+
+const packageName = basename(
+	cwd().replace(resolve(import.meta.dirname, "../packages"), "")
+);
+console.clear();
+addLoader();
+
+if (mode === "dev") {
+	logger.info(`Starting ${workspaceName}/${packageName} in development mode...`);
+	console.time("Start time");
+
+	console.time("Updating dependencies");
+	const deps = await import("../tools/utils").then(async (utils) =>
+		utils.updateProjectReferencesDeep(packageName)
+	);
+	console.warn(deps);
+	console.timeEnd("Updating dependencies");
+
+	console.time("Type Checking");
+	const result = spawnSync(
+		"npx",
+		["tsc", "-b", `./packages/${packageName}/tsconfig.package.json`],
+		{
+			cwd: resolve(import.meta.dirname, "../"),
+			stdio: [undefined, process.stdout, process.stderr],
+		}
+	);
+	console.timeEnd("Type Checking");
+	console.timeEnd("Start time");
+	if (result.status !== 0 || result.error) {
+		process.exit(result.status ?? 1);
+	} else {
+		console.log(`NodeJS${process.version}`);
+	console.log(typeGradientFn.multiline((await figlet(`${workspaceName}/${packageName}#${version}`,{}) ?? '')))
+	}
+}

@@ -1,3 +1,3 @@
-import { updateReferences } from "tools/utils";
+import { updateReferences } from "../utils";
 
 await updateReferences();

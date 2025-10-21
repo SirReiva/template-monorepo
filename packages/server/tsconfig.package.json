@@ -17,7 +17,7 @@
         "dev": {
             "command": "node",
             "args": [
-                "--import=../../loader/index.mjs?mode=dev",
+                "--import=../../loader/index.ts?mode=dev",
                 "--experimental-transform-types",
                 "--disable-warning=ExperimentalWarning",
                 "--watch-path",
@@ -28,12 +28,16 @@
         "start": {
             "command": "node",
             "args": [
-                "--import=../../loader/index.mjs",
+                "--import=../../loader/index.ts",
                 "--experimental-transform-types",
                 "--disable-warning=ExperimentalWarning",
                 "./src/main.ts"
             ]
         }
     },
-    "references": []
+    "references": [
+        {
+            "path": "..\\common\\tsconfig.package.json"
+        }
+    ]
 }

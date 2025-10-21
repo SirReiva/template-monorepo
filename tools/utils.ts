@@ -95,9 +95,32 @@ export const getProjectWorkspaceDeps = async (pkgName: string, packageNames: str
 export const updateReferences = async () => {
     const packageNames = await getDirectories(resolve(import.meta.dirname, `..${sep}${workspaceDir}`));
 
-    await Promise.all(packageNames.map(async pkgName => {
+    const deps = await Promise.all(packageNames.map(async pkgName => {
         const innerDeps = await loadProjectDeps(resolve(import.meta.dirname, `..${sep}packages${sep}${pkgName}${sep}src`));
         const innerWorksapceDeps = getWorkspaceDeps(innerDeps, pkgName, packageNames);
         await updateProjectReferences(pkgName, innerWorksapceDeps);
+		return innerWorksapceDeps
     }));
+	return Array.from(new Set(deps.flat()));
+}
+
+export const updateProjectReferencesDeep = async (projectName: string) => {
+
+    const packageNames = await getDirectories(resolve(import.meta.dirname, `..${sep}${workspaceDir}`));
+
+	return await internalUpdateReferencesDeep(projectName, packageNames);
+}
+
+const internalUpdateReferencesDeep = async (projectName: string, packageNames: string[]): Promise<any> => {
+	const innerDeps = await loadProjectDeps(resolve(import.meta.dirname, `..${sep}packages${sep}${projectName}${sep}src`));
+	const innerWorksapceDeps = getWorkspaceDeps(innerDeps, projectName, packageNames);
+	await updateProjectReferences(projectName, innerWorksapceDeps);
+	const nested = await Promise.all(innerWorksapceDeps.map(async dep => {
+		return await internalUpdateReferencesDeep(dep, packageNames);
+	}));
+
+	return {
+		[projectName]: innerWorksapceDeps,
+		...nested.reduce((acc, curr) => ({ ...acc, ...curr }), {})
+	};
 }

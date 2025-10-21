@@ -1,13 +1,9 @@
-import { Application } from "@template/server-framework/class/application";
+import { port } from "@template/common";
+import { createServer } from "http";
 
-class Test {
-	constructor(public readonly a: number, public readonly b: string) {}
-
-	async init(app: Application) {}
-}
-
-const application = new Application();
-
-application.addModule(Test, () => [1, "2"] as const);
-
-await application.init();
+createServer((req, res) => {
+	res.writeHead(200, { "Content-Type": "text/plain" });
+	res.end("Hello, World!\n");
+}).listen(port, () => {
+	console.log("Server running at http://localhost:3000");
+});

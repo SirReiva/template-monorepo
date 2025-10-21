@@ -6,6 +6,7 @@ import { basename, resolve } from "node:path";
 import { cwd } from "node:process";
 import { pathToFileURL } from "node:url";
 import { Logger } from 'tslog';
+import YAML from 'yaml';
 import packageJson from "../package.json" with { type: "json" };
 
 const logger = new Logger({ name: "Loader", });
@@ -42,11 +43,12 @@ if (mode === "dev") {
 	console.time("Start time");
 
 	console.time("Updating dependencies");
-	const deps = await import("../tools/utils").then(async (utils) =>
+	const dependecies = await import("../tools/utils").then(async (utils) =>
 		utils.updateProjectReferencesDeep(packageName)
 	);
 	console.warn(deps);
 	console.timeEnd("Updating dependencies");
+console.warn(YAML.stringify({ dependecies }, { indent: 2 }).trim());
 
 	console.time("Type Checking");
 	const result = spawnSync(

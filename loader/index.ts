@@ -46,7 +46,6 @@ if (mode === "dev") {
 	const dependecies = await import("../tools/utils").then(async (utils) =>
 		utils.updateProjectReferencesDeep(packageName)
 	);
-	console.warn(deps);
 	console.timeEnd("Updating dependencies");
 console.warn(YAML.stringify({ dependecies }, { indent: 2 }).trim());
 

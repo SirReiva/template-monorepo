@@ -1,45 +1,39 @@
 import figlet from "figlet";
-import gradient from 'gradient-string';
+import gradient from "gradient-string";
 import { spawnSync } from "node:child_process";
 import { register } from "node:module";
 import { basename, resolve } from "node:path";
 import { cwd } from "node:process";
 import { pathToFileURL } from "node:url";
-import { Logger } from 'tslog';
-import YAML from 'yaml';
-import packageJson from "../package.json" with { type: "json" };
-
-const logger = new Logger({ name: "Loader", });
+import YAML from "yaml";
+import packageJson from "../package.json" assert { type: "json" };
 
 const workspaceName = `@${packageJson.name}`;
 const version = packageJson.version;
 
 const typeGradients = Object.keys(gradient);
 
-const typeGradient =(typeGradients[Math.floor(Math.random() * typeGradients.length)]) as keyof typeof gradient;
+const typeGradient = typeGradients[
+	Math.floor(Math.random() * typeGradients.length)
+] as keyof typeof gradient;
 const typeGradientFn = gradient[typeGradient];
 
 const mode = new URL(import.meta.url).searchParams.get("mode");
-
-const addLoader = () => {
-	register("../../loader/loader.ts", pathToFileURL("./"), {
-		data: {
-			packageName,
-			workspaceName,
-			version,
-		},
-		parentURL: pathToFileURL("./"),
-	});
-};
 
 const packageName = basename(
 	cwd().replace(resolve(import.meta.dirname, "../packages"), "")
 );
 console.clear();
-addLoader();
+register("../../loader/loader.ts", pathToFileURL("./"), {
+	data: {
+		packageName,
+		workspaceName,
+		version,
+	},
+	parentURL: pathToFileURL("./"),
+});
 
 if (mode === "dev") {
-	logger.info(`Starting ${workspaceName}/${packageName} in development mode...`);
 	console.time("Start time");
 
 	console.time("Updating dependencies");
@@ -47,7 +41,7 @@ if (mode === "dev") {
 		utils.updateProjectReferencesDeep(packageName)
 	);
 	console.timeEnd("Updating dependencies");
-console.warn(YAML.stringify({ dependecies }, { indent: 2 }).trim());
+	console.warn(YAML.stringify({ dependecies }, { indent: 2 }).trim());
 
 	console.time("Type Checking");
 	const result = spawnSync(
@@ -64,6 +58,13 @@ console.warn(YAML.stringify({ dependecies }, { indent: 2 }).trim());
 		process.exit(result.status ?? 1);
 	} else {
 		console.log(`NodeJS${process.version}`);
-	console.log(typeGradientFn.multiline((await figlet(`${workspaceName}/${packageName}#${version}`,{}) ?? '')))
+		console.log(
+			typeGradientFn.multiline(
+				(await figlet(
+					`${workspaceName}/${packageName}#${version}`,
+					{}
+				)) ?? ""
+			)
+		);
 	}
 }

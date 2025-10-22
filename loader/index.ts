@@ -23,7 +23,7 @@ const mode = new URL(import.meta.url).searchParams.get("mode");
 const packageName = basename(
 	cwd().replace(resolve(import.meta.dirname, "../packages"), "")
 );
-console.clear();
+
 register("../../loader/loader.ts", pathToFileURL("./"), {
 	data: {
 		packageName,

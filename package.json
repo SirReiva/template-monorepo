@@ -20,6 +20,7 @@
 		"@vitejs/plugin-react": "5.0.4",
 		"globals": "16.4.0",
 		"gradient-string": "3.0.0",
+		"inquirer": "12.10.0",
 		"rimraf": "6.0.1",
 		"tsx": "4.20.6",
 		"typescript": "5.9.3",
@@ -29,8 +30,6 @@
 	"dependencies": {
 		"camelcase-keys": "10.0.0",
 		"figlet": "1.9.3",
-		"fullscreen-ink": "0.1.0",
-		"ink": "6.3.1",
 		"jsonriver": "1.0.2",
 		"react": "19.2.0",
 		"react-dom": "19.2.0",

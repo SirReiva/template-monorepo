@@ -108,10 +108,10 @@ export const load: LoadHook = async (url, context, defaultLoad) => {
 			return {
 				shortCircuit: true,
 				format: "module",
-				source: await readFile(
+				source: `${await readFile(
 					cacheFile.replace(/\.tsx$/, ".js"),
 					"utf-8"
-				),
+				)}\n\n//# sourceURL=${url}`,
 			};
 		}
 	} catch (error) {}

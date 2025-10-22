@@ -5,6 +5,7 @@ import { register } from "node:module";
 import { basename, resolve } from "node:path";
 import { cwd } from "node:process";
 import { pathToFileURL } from "node:url";
+import ora from "ora";
 import YAML from "yaml";
 import packageJson from "../package.json" assert { type: "json" };
 
@@ -34,15 +35,21 @@ register("../../loader/loader.ts", pathToFileURL("./"), {
 });
 
 if (mode === "dev") {
+	const oraUpdatedeps = ora("Updating dependencies").start();
 	console.time("Start time");
-
 	console.time("Updating dependencies");
 	const dependecies = await import("../tools/utils").then(async (utils) =>
 		utils.updateProjectReferencesDeep(packageName)
 	);
+	oraUpdatedeps.stop();
 	console.timeEnd("Updating dependencies");
-	console.warn(YAML.stringify({ dependecies }, { indent: 2 }).trim());
+	console.warn(
+		YAML.stringify({ dependecies }, { indent: 2 })
+			.trim()
+			.replaceAll("[]", "(no dependecies)")
+	);
 
+	const oraTypeCheck = ora("Type Checking").start();
 	console.time("Type Checking");
 	const result = spawnSync(
 		"npx",
@@ -52,6 +59,7 @@ if (mode === "dev") {
 			stdio: [undefined, process.stdout, process.stderr],
 		}
 	);
+	oraTypeCheck.stop();
 	console.timeEnd("Type Checking");
 	console.timeEnd("Start time");
 	if (result.status !== 0 || result.error) {

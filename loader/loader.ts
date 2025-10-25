@@ -96,7 +96,9 @@ export const load: LoadHook = async (url, context, defaultLoad) => {
 	try {
 		const fileFullPath = fileURLToPath(url);
 		const ext = extname(fileFullPath);
-		if (ext === ".tsx") {
+
+		//TODO: While JS Decorators are not natively supported
+		if (ext === ".tsx" || ext === ".ts") {
 			const parts = fileFullPath
 				.split(`${sep}packages${sep}`)
 				.pop()
@@ -109,7 +111,7 @@ export const load: LoadHook = async (url, context, defaultLoad) => {
 				shortCircuit: true,
 				format: "module",
 				source: `${await readFile(
-					cacheFile.replace(/\.tsx$/, ".js"),
+					cacheFile.replace(/\.tsx?$/, ".js"),
 					"utf-8"
 				)}\n\n//# sourceURL=${url}`,
 			};

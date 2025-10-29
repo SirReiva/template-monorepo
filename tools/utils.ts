@@ -199,14 +199,16 @@ const internalUpdateReferencesDeep = async (
 	if (!alreadyUpdated.includes(projectName))
 		await updateProjectReferences(projectName, innerWorksapceDeps);
 	const nested = await Promise.all(
-		innerWorksapceDeps.map(async (dep) => {
-			alreadyUpdated.push(projectName);
-			return await internalUpdateReferencesDeep(
-				dep,
-				packageNames,
-				alreadyUpdated
-			);
-		})
+		innerWorksapceDeps
+			.filter((dep) => !alreadyUpdated.includes(dep))
+			.map(async (dep) => {
+				alreadyUpdated.push(projectName);
+				return await internalUpdateReferencesDeep(
+					dep,
+					packageNames,
+					alreadyUpdated
+				);
+			})
 	);
 
 	return {

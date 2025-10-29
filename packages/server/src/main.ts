@@ -1,4 +1,5 @@
 import { port } from "@template/common";
+import { Application } from "@template/server-framework/class/application";
 import { createServer } from "http";
 
 const Log = (
@@ -23,9 +24,11 @@ type Greeting = {
 export class Example {
 	@Log
 	static sayHello(name: string): Greeting {
-		return { data: `Hello, ${name}!!` };
+		return { data: `Hello, ${name}!!!` };
 	}
 }
+
+new Application().init();
 
 createServer((req, res) => {
 	res.writeHead(200, { "Content-Type": "text/plain" });

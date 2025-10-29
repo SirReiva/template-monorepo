@@ -1,16 +1,21 @@
 {
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"outDir": "../../.cache/server-framework",
-		"rootDir": "./src",
-		"tsBuildInfoFile": "../../.cache/server-framework.tsbuildinfo",
-		"composite": true
-	},
-	"include": [
-		"src"
-	],
-	"exclude": [
-		"test",
-		"lib"
-	]
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "../../.cache/server-framework",
+        "rootDir": "./src",
+        "tsBuildInfoFile": "../../.cache/server-framework.tsbuildinfo",
+        "composite": true
+    },
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "test",
+        "lib"
+    ],
+    "references": [
+        {
+            "path": "..\\common\\tsconfig.package.json"
+        }
+    ]
 }

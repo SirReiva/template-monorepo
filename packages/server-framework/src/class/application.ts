@@ -1,3 +1,4 @@
+import { port } from "@template/common";
 import type { ApplicationModule } from "../interface/application-module";
 import type { Type } from "../interface/utils";
 
@@ -25,6 +26,6 @@ export class Application {
 		await Promise.all(
 			this.moduleInstances.map((module) => module.init?.(this))
 		);
-		console.log("Application: init");
+		console.log("Application: init", port);
 	}
 }

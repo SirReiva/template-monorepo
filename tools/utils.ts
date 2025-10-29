@@ -196,7 +196,8 @@ const internalUpdateReferencesDeep = async (
 		projectName,
 		packageNames
 	);
-	await updateProjectReferences(projectName, innerWorksapceDeps);
+	if (!alreadyUpdated.includes(projectName))
+		await updateProjectReferences(projectName, innerWorksapceDeps);
 	const nested = await Promise.all(
 		innerWorksapceDeps.map(async (dep) => {
 			alreadyUpdated.push(projectName);

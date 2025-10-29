@@ -182,7 +182,8 @@ export const updateProjectReferencesDeep = async (projectName: string) => {
 
 const internalUpdateReferencesDeep = async (
 	projectName: string,
-	packageNames: string[]
+	packageNames: string[],
+	alreadyUpdated: string[] = []
 ): Promise<any> => {
 	const innerDeps = await loadProjectDeps(
 		resolve(
@@ -198,7 +199,12 @@ const internalUpdateReferencesDeep = async (
 	await updateProjectReferences(projectName, innerWorksapceDeps);
 	const nested = await Promise.all(
 		innerWorksapceDeps.map(async (dep) => {
-			return await internalUpdateReferencesDeep(dep, packageNames);
+			alreadyUpdated.push(projectName);
+			return await internalUpdateReferencesDeep(
+				dep,
+				packageNames,
+				alreadyUpdated
+			);
 		})
 	);
 

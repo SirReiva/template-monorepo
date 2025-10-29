@@ -16,10 +16,14 @@ const Log = (
 	return descriptor;
 };
 
+type Greeting = {
+	data: string;
+};
+
 export class Example {
 	@Log
-	static sayHello(name: string): string {
-		return `Hello, ${name}!!`;
+	static sayHello(name: string): Greeting {
+		return { data: `Hello, ${name}!!` };
 	}
 }
 
